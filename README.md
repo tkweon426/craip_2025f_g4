@@ -357,8 +357,6 @@ You will build three essential modules for navigation:
 | Path Planning | 10 pts | `path_planning` |
 | Perception | 10 pts | `perception` |
 
-**Submission**: You must submit these three packages approximately one week before the competition week. Each package will be evaluated independently.
-
 ### Competition (60 points)
 
 You will integrate all modules into a complete navigation system to accomplish five missions.
@@ -457,13 +455,13 @@ Create a ROS2 package named `localization` with nodes (Python or C++) that:
 **Points**: 20 points (relative grading among teams)
 
 **Evaluation Process**: 
-The TAs will create 3 robot trajectory datasets using `rosbag2`. Your localization module will be tested on these pre-recorded trajectories, and its output will be compared against ground truth poses.
+The TAs will create 3 robot trajectory datasets using `ros bag`. Your localization module will be tested on these pre-recorded trajectories, and its output will be compared against ground truth poses.
 
 **Evaluation Metrics**:
 
 1. **Frequency**: Your localization node must publish pose estimates at **≥15 Hz**
    - This ensures real-time performance for navigation
-   - Lower frequencies will result in point deductions
+   - Lower frequency will result in point deductions
 
 2. **Accuracy**: Measured using **Absolute Trajectory Error (ATE)**
    - Metric: Median ATE across all trajectory points
@@ -474,7 +472,7 @@ The TAs will create 3 robot trajectory datasets using `rosbag2`. Your localizati
 
 1. **No Ground Truth Data**: 
    - Do **not** use ground truth poses from Gazebo (e.g., `go1_gt_pose_publisher.py`)
-   - Estimate the pose using only realistic sensor data that would be available on a real robot
+   - Estimate the pose using only sensor data attached to the robot
    
 2. **No External Navigation Packages**: 
    - Do **not** use existing navigation packages like Nav2's AMCL
@@ -485,7 +483,7 @@ The TAs will create 3 robot trajectory datasets using `rosbag2`. Your localizati
    - Add launch arguments for initial pose (`x`, `y`, `z`, `roll`, `pitch`, `yaw`)
    - Default spawn: `x=0, y=1, z=0.5` with `roll=0, pitch=0, yaw=0`
    - Your localization must initialize correctly from any starting pose specified via arguments
-   - This is critical for evaluation with different starting positions
+   - **This is critical for evaluation with different starting positions**
 
 ---
 
@@ -527,7 +525,7 @@ Create a ROS2 package named `path_planning` with nodes (Python or C++) that:
 6. **Publish the path**: 
    - Topic: `/local_path`
    - Message type: `nav_msgs/msg/Path`
-   - This path will be consumed by the `path_tracker` node 
+   - This path will be used by the `path_tracker` node 
 
 **Related Topics:**
 | Topic | Message Type | Description |
@@ -575,14 +573,12 @@ The TAs will test your path planning module with 4 different scenarios: 2 differ
 **Evaluation Metrics**:
 
 1. **Goal Arrival**: 
-   - **Position accuracy**: L2 norm distance between final position and goal position
+   - **Position accuracy**: L2 norm between final position and goal position
    - **Orientation accuracy**: Angular difference between final yaw and goal yaw
-   - Threshold for success will be announced before evaluation
 
 2. **Collision Avoidance**: 
    - Visual inspection in Gazebo simulation
    - Any contact with obstacles results in failure for that scenario
-   - Borderline cases will be reviewed using contact sensor data
 
 ### ⚠️ Important Requirements: 
 
@@ -616,7 +612,7 @@ The TAs will test your path planning module with 4 different scenarios: 2 differ
 
 **Why this matters**: 
 
-To search for and find a desired object, the robot needs to interpret camera images, determine whether the target object is present, and if so, localize it. The robot must then move closer to the object and align itself so that the object is centered in its field of view. 
+To find a desired object, the robot needs to interpret camera images, determine whether the target object is present, and if so, localize it. The robot must then move closer to the object and align itself so that the object is centered in its field of view. 
 
 
 **What you need to do:**
@@ -694,7 +690,7 @@ Create a ROS2 package named `perception` with nodes (Python or C++) that:
 **Points**: 10 points (relative grading among teams)
 
 **Evaluation Process**: 
-The TAs will test your perception module 3 times. At each test, the robot will be placed in a small closed room **(the box room in the hospital)** with one good food item and one bad food item (see Competition Mission 2 for food examples). **There would be no object at the first scene. Robot need to travel the room little bit.** The robot must:
+The TAs will test your perception module 3 times. At each test, the robot will be placed in a small room **(the empty room in the hospital)** with one good food item and one bad food item (see competition mission 2 for food examples and mission 5 to find where the empty room is) **There would be no object at the first scene.** Robot need to travel the room little bit. **Rotating with fixed position would be enough to find objects.** The robot must:
 - Detect and distinguish between good and bad food
 - Approach the good food
 - Center itself in front of the good food
@@ -712,7 +708,6 @@ The TAs will test your perception module 3 times. At each test, the robot will b
    - Measured after the final bark message
    - Horizontal position of the object in the camera image
    - Target: object center within middle third of image [width/3, 2×width/3]
-   - Deviation from image center will be scored
 
 3. **Classification Accuracy**:
    - Penalty if robot barks at bad food or fails to identify good food 
@@ -722,7 +717,7 @@ The TAs will test your perception module 3 times. At each test, the robot will b
 1. **No Ground Truth Object Poses**: 
    - Do **not** subscribe to ground truth object poses from Gazebo
    - You must detect and localize objects using only camera data
-   - Ground truth robot pose (`go1_gt_pose_publisher.py`) is allowed for module evaluation
+   - **Ground truth robot pose (`go1_gt_pose_publisher.py`) is allowed for module evaluation**
 
 2. **Ground Truth Robot Pose Allowed for Module Evaluation**: 
    - For **module design evaluation only**, you may use ground truth robot pose
@@ -730,7 +725,6 @@ The TAs will test your perception module 3 times. At each test, the robot will b
    - However, for the **competition**, you must use your own localization module
 
 3. **Simplified Navigation for Testing**: 
-   - The evaluation room (box room) has no obstacles between robot and food
    - You may use the simple `move_go1.py` node for basic movement during module evaluation
    - For competition missions, you'll need full path planning integration 
 
@@ -738,12 +732,12 @@ The TAs will test your perception module 3 times. At each test, the robot will b
 
 # ⚔️ Competition
 
-In the competition phase, you will integrate all three modules (localization, path planning, perception) into a complete autonomous navigation system. The robot will receive high-level commands and must accomplish various missions.
+In the competition, you will integrate all three modules (localization, path planning, perception) into a complete autonomous navigation system. The robot will receive high-level language commands and must accomplish various missions.
 
 **Key Rules**:
 - You **must** use your own localization module (no ground truth robot poses)
 - You **must** use your own path planning module for collision-free navigation  
-- Ground truth object poses from Gazebo are **not allowed**
+- Using ground truth object poses from Gazebo is **not allowed**
 - Missions will be announced via natural language commands (e.g., "Please navigate me to the toilet")
 
 ---
@@ -754,20 +748,20 @@ In the competition phase, you will integrate all three modules (localization, pa
 
 **Task Description**: 
 
-The robot will receive a natural language command (e.g., "Go to the toilet"). Your system must navigate the robot to the toilet and position it with a clear view. The navigation stop when robot `bark` to alert the position of toilet.
+The robot will receive a natural language command (e.g., "Go to the toilet"). Your system must navigate the robot to the toilet. The toilet should be aligned to camera center. The navigation stop when robot `bark` to alert the position of toilet.
 
 **Approach**: 
 
 For this mission, you may **pre-calculate and hard-code** the toilet's position:
 - Explore the map before the competition
-- Determine the 2D pose that positions the robot to face the toilet
+- Determine the 2D pose that faces toilet directly
 - Example: `x=10.0, y=5.0, yaw=1.57` (this is just an example, not the actual position)
 - Use your path planning to navigate to this pre-defined goal
 
 **Requirements**:
 - Robot must `bark` when the conditions (distance and orientation) are satisfied. Condition for barking is same as `module design 3`.
-- Navigation must be collision-free for performance. But we do not degrade the score with this. 
-- Must use your own localization and path planning modules
+- Navigation must be collision-free for high rate success. But we do not degrade the score with this. 
+- You must use your own localization and path planning modules
 
 ### 📊 Evaluation:
 
@@ -799,13 +793,26 @@ The following food items will be placed in the environment:
 - **Left column (Good Food - Edible)**: Banana, Apple, Pizza
 - **Right column (Bad Food - Not Edible)**: Rotten/spoiled versions, inedible objects
 
-**Note on Food Placement**: The physical position (floor, table, etc.) does not matter. A good apple is edible whether on the floor or floating in the air - only the classification matters.
-
-
 <img src="images/mission_2_1.png" alt="Mission 2 1" width="600"/>
 
 
 <img src="images/mission_2_2.png" alt="Mission 2 2" width="600"/>
+
+
+**Food Placement**: 
+
+We provide example map with foods for practice. 
+There are total 10 foods in the map. The hospital map has 20 rooms, and half of them (10 rooms) have the food each. 
+We provide a map with food for your practice. 
+But for the final competition, the position of the foods will be changed. (room change from room1 to room2, or position change within the room.)
+The physical position (floor, table, etc.) does not matter. A good apple is edible whether on the floor or floating in the air - only the classification matters.
+
+
+<img src="images/mission_2_3.png" alt="Mission 2 3" width="600"/>
+
+
+<img src="images/mission_2_4.png" alt="Mission 2 4" width="600"/>
+
 
 
 ### 📊 Evaluation:
@@ -814,31 +821,76 @@ The following food items will be placed in the environment:
 
 ## Mission 3
 
-**Status**: To Be Announced
+**Goal**: Move to cone of specified color
 
-**Source**: Mission will be designed based on student proposals and feedback.
+**Task Description**:
+The robot will receive a natural language command (e.g. "Go to the red cone"). Your system must navigate the robot to the specified colored cone. The navigation stops when robot `bark` to alert the position of the cone.
 
-Details will be provided during the course.
+
+<img src="images/mission_3.png" alt="Mission 3" width="600"/>
+
+
+**Requirements**:
+There are three cones with different color (red, green, and blue). 
+The positions of cones will not be changed. But the order might be different. 
+For example, currently the order is blue cone, red cone, and green cone from left.
+But that order might be changed to red, green, and blue.
+
+### 📊 Evaluation:
+
+**Points**: 10 points with success/failure. The robot should bark when conditions are satisfied.
+
 
 ---
 
 ## Mission 4
 
-**Status**: To Be Announced
+**Goal**: Move to box to the goal position
 
-**Source**: Mission will be designed based on student proposals and feedback.
+**Task Description**:
+The robot will receive a natural language command (e.g. "Move the box to the goal position"). 
+Your system must push the box to the goal position with the robot body. The goal position is specified as red area.
 
-Details will be provided during the course.
+
+<img src="images/mission_4_1.png" alt="Mission 4 1" width="600"/>
+
+
+**Requirements**:
+The goal position (red area) will not be changed for the final competition.
+But the position of delivery box will be changed. 
+TAs will randomly choose position of delivery box among three candidates. 
+Distance between goal area and delivery box is 2m, and the orientation of box will be aligned to make pushing easy.
+
+<img src="images/mission_4_2.png" alt="Mission 4 2" width="600"/>
+
+
+### 📊 Evaluation:
+
+**Points**: 10 points with success/failure. The box should be in the red area.
 
 ---
 
 ## Mission 5
 
-**Status**: To Be Announced
+**Goal**: Move to the empty room without stop sign
 
-**Source**: Mission will be designed based on student proposals and feedback.
+**Task Description**:
+The robot will receive a natural language command (e.g. "Move to the empty room"). 
+There are two empty room in the hospital. You should go one of them without the stop sign.
 
-Details will be provided during the course.
+
+<img src="images/mission_5_1.png" alt="Mission 5 1" width="600"/>
+
+
+<img src="images/mission_5_2.png" alt="Mission 5 2" width="600"/>\
+
+
+**Requirements**:
+The position of the stop sign will be changed (in front of empty room1 or room2, how far from the entrance)
+
+### 📊 Evaluation:
+
+**Points**: 10 points with success/failure. The robot body should be in the room.
 
 ---
 
