@@ -669,45 +669,46 @@ This module focuses on building a **ROS2 perception system** capable of detectin
 
 1. Subscribe to Camera Data
 
-Your node must subscribe to:
+   Your node must subscribe to:
 
-- **RGB Image**
-  - `/camera_top/image`
-- **Depth Image**
-  - `/camera_top/depth`
+   - **RGB Image**
+   - `/camera_top/image`
+   - **Depth Image**
+   - `/camera_top/depth`
 
-### 2. Object Detection & Classification
+2. Object Detection & Classification
 
-Your perception node should:
+   Your perception node should:
 
-- Run an object detection model such as YOLO
-- Determine whether the target object exists
-- Use the depth image to obtain the distance to the target object
+   - Run an object detection model such as YOLO
+   - Determine whether the target object exists
+   - Use the depth image to obtain the distance to the target object
 
-### 3. Required Published Topics
+3. Required Published Topics
 
-The node must publish the following:
+   The node must publish the following:
 
-| Topic | Type | Description |
-|------|------|-------------|
-| `/camera/detections/image` | `sensor_msgs/Image` | Original RGB image with bounding boxes |
-| `/detections/labels` | `std_msgs/String` | Detected object label(s) |
-| `/detections/distance` | `std_msgs/Float32` | Distance to the detected object |
-| `/robot_dog/speech` | `std_msgs/String` | `"bark"` if an edible object is centered, otherwise `"None"` |
+   | Topic | Type | Description |
+   |------|------|-------------|
+   | `/camera/detections/image` | `sensor_msgs/Image` | Original RGB image with bounding boxes |
+   | `/detections/labels` | `std_msgs/String` | Detected object label(s) |
+   | `/detections/distance` | `std_msgs/Float32` | Distance to the detected object |
+   | `/robot_dog/speech` | `std_msgs/String` | `"bark"` if an edible object is centered, otherwise `"None"` |
 
-#### Center Region Rule
+   #### Center Region Rule
 
-- The image's leftmost and rightmost **1/5** regions are *excluded*.
-- If an edible object is detected whose bounding-box center lies within the **middle 3/5** of the image → publish `"bark"`.
-### 4. Interface Verification
+      - The image's leftmost and rightmost **1/5** regions are *excluded*.
+      - If an edible object is detected whose bounding-box center lies within the **middle 3/5** of the image → publish `"bark"`.
 
-<img src="images/perception_module_example.png" alt="Perception Module Example" width="600"/>
+4. Interface Verification
 
-Run the viewer to verify all published topics:
+   <img src="images/perception_module_example.png" alt="Perception Module Example" width="600"/>
 
-```bash
-ros2 launch module_test interface_viewer.launch.py
-```
+   Run the viewer to verify all published topics:
+
+   ```bash
+   ros2 launch module_test interface_viewer.launch.py
+   ```
 
 
 **Learning Steps:**
