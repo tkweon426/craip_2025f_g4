@@ -671,10 +671,10 @@ This module focuses on building a **ROS2 perception system** capable of detectin
 
    Your node must subscribe to:
 
-   - **RGB Image**
-   - `/camera_top/image`
-   - **Depth Image**
-   - `/camera_top/depth`
+   - **RGB Image Topic**: `/camera_top/image`
+   - **Depth Image Topic**: `/camera_top/depth`
+   - **Point Cloud Topic**: `/camera_top/points`
+   - **Camera Info**: `/camera_top/camera_info`
 
 2. Object Detection & Classification
 
@@ -726,17 +726,37 @@ This module focuses on building a **ROS2 perception system** capable of detectin
    - Integrate depth sensing for distance estimation
    - Implement control logic for approaching and centering
 
-### 📊 Evaluation:
+---
+## 📊 Evaluation: 10 points (absolute evaluation, pass/fail)
 
-**Points**: 10 points (absolute evaluation)
+### Overview
+Two ROS bag files will be provided. For each bag file, you will replay the data, run the provided launch file, and **record the viewer output as a video**. Any screen-recording software (e.g., SimpleScreenRecorder, OBS, etc.) may be used.
 
-**Evaluation Process**: 
-A ROS bag will be provided. You will replay the ROS bag, run the provided launch file, record the viewer output as a video, and submit the recording.
+### Bag File Description
+Each ROS bag includes a sequence in which the robot **rotates in place**, capturing its surroundings. The images contain **multiple objects that appear in the actual competition environment**. Your system must process these scenes to detect objects and determine when the barking condition is met.
 
-**Evaluation Criteria**:
-Assessment follows an absolute and qualitative evaluation. If an edible object is centered within a distance of 3 meters or less, the evaluator checks whether:
-- the intermediate outputs (detection results, distance) are correct, and
-- the bark topic is published at the appropriate moment.
+### Task Requirement
+When an object is located **within 3 meters** of the robot and appears clearly in view, your system must fulfill the following:
+
+#### 1. Object Detection
+   - The system must accurately detect objects within a 3-meter radius.  
+   - All **intermediate outputs** (detection results, distance estimation) must be clearly and correctly visualized in the viewer.
+
+#### 2. Bark Topic Publishing
+   - When detected objects within 3 meters are centered in the view,  
+   - The system must publish the **`/bark`** topic at the **appropriate moment**.
+
+### Submission
+   - Submit a **screen-recorded video** showing the full viewer output.  
+   - Submit **one video for each bag file** (two videos total).  
+
+### Evaluation Criteria
+Evaluation follows an **absolute and qualitative** standard:
+
+   - Detection of objects within the scene
+   - Reasonable distance estimation (does not need to be perfectly accurate)
+   - Correct timing of `/bark` topic publication when an object is centered within 3 meters  
+   - Evaluation is pass/fail
 ---
 
 # ⚔️ Competition
