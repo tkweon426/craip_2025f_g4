@@ -737,6 +737,8 @@ Two ROS bag files will be provided. For each bag file, you will replay the data,
 ### Bag File Description
 Each ROS bag includes a sequence in which the robot **rotates in place**, capturing its surroundings. The images contain **multiple objects that appear in the actual competition environment**. Your system must process these scenes to detect objects and determine when the barking condition is met.
 
+**Download Link**: [Perception Module Test Bag Files](https://drive.google.com/file/d/1aQZ1qr5Q9m-JcWN4qgewoQ4dtE0N_2QQ/view?usp=sharing)
+
 ### Task Requirement
 When an object is located **within 3 meters** of the robot and appears clearly in view, your system must fulfill the following:
 
