@@ -23,6 +23,7 @@ install(
     localization/odom_localizer_node.py
     localization/global_localizer_node.py
     localization/utils.py
+    scripts/record_trajectory.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
