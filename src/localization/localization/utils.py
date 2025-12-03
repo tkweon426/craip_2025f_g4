@@ -198,5 +198,338 @@ def _update_alignment(current_pcd_paired, previous_pcd_paired):
     R = U @ np.diag([1, np.linalg.det(U @ Vt)]) @ Vt
     
     # Step 6: Compute translation
-    t = current_centroid - R @ previous_centroid    
-    return R, t        
+    t = current_centroid - R @ previous_centroid
+    return R, t
+
+
+# ============================================================================
+# Particle Filter Utilities
+# ============================================================================
+
+def initialize_particles(num_particles, initial_pose, variance):
+    """
+    Initialize particles around initial pose with Gaussian noise.
+
+    Args:
+        num_particles: Number of particles to create
+        initial_pose: [x, y, theta] - initial pose estimate
+        variance: [var_x, var_y, var_theta] - variance for each dimension
+
+    Returns:
+        particles: List of dicts with keys 'x', 'y', 'theta', 'weight'
+    """
+    particles = []
+    for _ in range(num_particles):
+        particle = {
+            'x': initial_pose[0] + np.random.normal(0, np.sqrt(variance[0])),
+            'y': initial_pose[1] + np.random.normal(0, np.sqrt(variance[1])),
+            'theta': initial_pose[2] + np.random.normal(0, np.sqrt(variance[2])),
+            'weight': 1.0 / num_particles
+        }
+        particles.append(particle)
+    return particles
+
+
+def normalize_weights(particles):
+    """
+    Normalize particle weights to sum to 1.
+
+    Args:
+        particles: List of particle dicts
+    """
+    total_weight = sum(p['weight'] for p in particles)
+    if total_weight > 0:
+        for p in particles:
+            p['weight'] /= total_weight
+    else:
+        # If all weights are zero, reset to uniform
+        uniform_weight = 1.0 / len(particles)
+        for p in particles:
+            p['weight'] = uniform_weight
+
+
+def resample_particles(particles):
+    """
+    Low-variance systematic resampling to prevent particle depletion.
+
+    Args:
+        particles: List of particle dicts with weights
+
+    Returns:
+        new_particles: Resampled list of particles
+    """
+    N = len(particles)
+    new_particles = []
+
+    # Low-variance systematic resampling
+    r = np.random.uniform(0, 1.0 / N)
+    c = particles[0]['weight']
+    i = 0
+
+    for m in range(N):
+        U = r + m / N
+        while U > c and i < N - 1:
+            i += 1
+            c += particles[i]['weight']
+
+        # Deep copy the selected particle
+        new_particle = {
+            'x': particles[i]['x'],
+            'y': particles[i]['y'],
+            'theta': particles[i]['theta'],
+            'weight': 1.0 / N
+        }
+        new_particles.append(new_particle)
+
+    return new_particles
+
+
+def estimate_pose_from_particles(particles):
+    """
+    Estimate robot pose from particle cloud using weighted mean.
+    Handles angle wrapping for theta using circular statistics.
+
+    Args:
+        particles: List of particle dicts with weights
+
+    Returns:
+        [x, y, theta]: Estimated pose
+    """
+    # Weighted mean for x, y
+    x = sum(p['x'] * p['weight'] for p in particles)
+    y = sum(p['y'] * p['weight'] for p in particles)
+
+    # Circular mean for theta (handle angle wrapping)
+    sin_sum = sum(np.sin(p['theta']) * p['weight'] for p in particles)
+    cos_sum = sum(np.cos(p['theta']) * p['weight'] for p in particles)
+    theta = np.arctan2(sin_sum, cos_sum)
+
+    return [x, y, theta]
+
+
+def predict_particles(particles, delta_pose, motion_noise):
+    """
+    Apply odometry-based motion model with noise to all particles.
+    Uses decomposition into rotation-translation-rotation for better accuracy.
+
+    Args:
+        particles: List of particle dicts
+        delta_pose: [dx, dy, dtheta] - change in pose from odometry
+        motion_noise: Dict with 'trans' and 'rot' noise parameters
+    """
+    dx, dy, dtheta = delta_pose
+
+    # Decompose motion into rotation-translation-rotation
+    delta_trans = np.sqrt(dx**2 + dy**2)
+
+    # Handle case when robot didn't move
+    if delta_trans < 1e-6:
+        delta_rot1 = 0.0
+    else:
+        delta_rot1 = np.arctan2(dy, dx)
+
+    delta_rot2 = dtheta - delta_rot1
+
+    # Normalize angles to [-pi, pi]
+    delta_rot1 = np.arctan2(np.sin(delta_rot1), np.cos(delta_rot1))
+    delta_rot2 = np.arctan2(np.sin(delta_rot2), np.cos(delta_rot2))
+
+    # Apply motion model to each particle
+    for p in particles:
+        # Add noise to motion parameters
+        noisy_rot1 = delta_rot1 + np.random.normal(0, motion_noise['rot'] * (abs(delta_rot1) + 0.1))
+        noisy_trans = delta_trans + np.random.normal(0, motion_noise['trans'] * (delta_trans + 0.1))
+        noisy_rot2 = delta_rot2 + np.random.normal(0, motion_noise['rot'] * (abs(delta_rot2) + 0.1))
+
+        # Update particle pose
+        p['theta'] += noisy_rot1
+        p['x'] += noisy_trans * np.cos(p['theta'])
+        p['y'] += noisy_trans * np.sin(p['theta'])
+        p['theta'] += noisy_rot2
+
+        # Normalize theta to [-pi, pi]
+        p['theta'] = np.arctan2(np.sin(p['theta']), np.cos(p['theta']))
+
+
+def transform_scan_to_map(scan_pcd, particle):
+    """
+    Transform scan points to map frame using particle pose.
+
+    Args:
+        scan_pcd: (N, 2) numpy array of scan points in base frame
+        particle: Dict with 'x', 'y', 'theta'
+
+    Returns:
+        scan_in_map: (N, 2) numpy array of scan points in map frame
+    """
+    # Create 2D rotation matrix
+    cos_theta = np.cos(particle['theta'])
+    sin_theta = np.sin(particle['theta'])
+    R = np.array([[cos_theta, -sin_theta],
+                  [sin_theta, cos_theta]])
+
+    # Transform: R @ scan_pcd.T + translation
+    translation = np.array([particle['x'], particle['y']])
+    scan_in_map = (R @ scan_pcd.T).T + translation
+
+    return scan_in_map
+
+
+def occupancy_grid_to_array(occupancy_grid):
+    """
+    Convert OccupancyGrid message to numpy array.
+
+    Args:
+        occupancy_grid: nav_msgs/OccupancyGrid message
+
+    Returns:
+        grid_array: 2D numpy array (height, width) with values 0-100
+        metadata: Dict with 'resolution', 'origin_x', 'origin_y'
+    """
+    width = occupancy_grid.info.width
+    height = occupancy_grid.info.height
+    resolution = occupancy_grid.info.resolution
+    origin_x = occupancy_grid.info.origin.position.x
+    origin_y = occupancy_grid.info.origin.position.y
+
+    # Convert data to numpy array and reshape
+    grid_array = np.array(occupancy_grid.data, dtype=np.int8).reshape((height, width))
+
+    metadata = {
+        'resolution': resolution,
+        'origin_x': origin_x,
+        'origin_y': origin_y,
+        'width': width,
+        'height': height
+    }
+
+    return grid_array, metadata
+
+
+def point_to_grid_index(x, y, metadata):
+    """
+    Convert world coordinates to grid indices.
+
+    Args:
+        x, y: World coordinates
+        metadata: Dict with 'resolution', 'origin_x', 'origin_y'
+
+    Returns:
+        (grid_x, grid_y): Grid indices (can be out of bounds)
+    """
+    grid_x = int((x - metadata['origin_x']) / metadata['resolution'])
+    grid_y = int((y - metadata['origin_y']) / metadata['resolution'])
+    return grid_x, grid_y
+
+
+def is_occupied(x, y, grid_array, metadata, threshold=65):
+    """
+    Check if a point in world coordinates is occupied in the map.
+
+    Args:
+        x, y: World coordinates
+        grid_array: 2D numpy array from occupancy_grid_to_array
+        metadata: Dict with map metadata
+        threshold: Occupancy threshold (0-100)
+
+    Returns:
+        True if occupied, False otherwise
+    """
+    grid_x, grid_y = point_to_grid_index(x, y, metadata)
+
+    # Check bounds
+    if grid_x < 0 or grid_x >= metadata['width'] or grid_y < 0 or grid_y >= metadata['height']:
+        return False
+
+    # Check occupancy (map uses row-major order: [y, x])
+    return grid_array[grid_y, grid_x] >= threshold
+
+
+def compute_likelihood_field(occupancy_grid):
+    """
+    Pre-compute distance transform for efficient likelihood computation.
+    Uses scipy's distance_transform_edt for fast computation.
+
+    Args:
+        occupancy_grid: nav_msgs/OccupancyGrid message
+
+    Returns:
+        likelihood_field: Dict with 'distances' array and metadata
+    """
+    from scipy import ndimage
+
+    grid_array, metadata = occupancy_grid_to_array(occupancy_grid)
+
+    # Create binary occupancy map (True = free, False = occupied)
+    # Handle unknown (-1) as free space
+    free_space = grid_array < 50  # Values < 50 are considered free
+
+    # Compute distance transform (distance to nearest obstacle)
+    # Note: distance_transform_edt computes distance to nearest False value
+    distances = ndimage.distance_transform_edt(free_space) * metadata['resolution']
+
+    likelihood_field = {
+        'distances': distances,
+        'metadata': metadata
+    }
+
+    return likelihood_field
+
+
+def compute_scan_likelihood(scan_points, likelihood_field, sensor_params):
+    """
+    Compute probability of observing scan given map using likelihood field.
+
+    Args:
+        scan_points: (N, 2) numpy array of scan points in map frame
+        likelihood_field: Dict from compute_likelihood_field
+        sensor_params: Dict with 'z_hit', 'z_rand', 'sigma_hit', 'max_range'
+
+    Returns:
+        likelihood: Probability of observing this scan (0-1)
+    """
+    distances = likelihood_field['distances']
+    metadata = likelihood_field['metadata']
+
+    z_hit = sensor_params['z_hit']
+    z_rand = sensor_params['z_rand']
+    sigma_hit = sensor_params['sigma_hit']
+    max_range = sensor_params['max_range']
+
+    log_likelihood = 0.0
+    valid_points = 0
+
+    for point in scan_points:
+        x, y = point
+        grid_x, grid_y = point_to_grid_index(x, y, metadata)
+
+        # Check bounds
+        if grid_x < 0 or grid_x >= metadata['width'] or grid_y < 0 or grid_y >= metadata['height']:
+            continue
+
+        # Get distance to nearest obstacle from pre-computed field
+        dist = distances[grid_y, grid_x]
+
+        # Gaussian probability centered at obstacles (dist=0)
+        gaussian_prob = np.exp(-0.5 * (dist / sigma_hit) ** 2) / (sigma_hit * np.sqrt(2 * np.pi))
+
+        # Mixture model: hit + random
+        prob = z_hit * gaussian_prob + z_rand / max_range
+
+        # Avoid log(0)
+        if prob > 1e-10:
+            log_likelihood += np.log(prob)
+            valid_points += 1
+
+    # Return normalized likelihood
+    if valid_points > 0:
+        # Average log likelihood, then exponentiate
+        avg_log_likelihood = log_likelihood / valid_points
+        # Clip to prevent numerical issues
+        avg_log_likelihood = np.clip(avg_log_likelihood, -100, 0)
+        likelihood = np.exp(avg_log_likelihood)
+    else:
+        # No valid points, return small likelihood
+        likelihood = 1e-10
+
+    return likelihood
