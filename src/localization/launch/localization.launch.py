@@ -19,19 +19,19 @@ def generate_launch_description():
     # Declare launch arguments for initial pose
     declare_x_cmd = DeclareLaunchArgument(
         'x',
-        default_value='5.0',
+        default_value='0.0',
         description='Initial x position in map frame (meters)'
     )
 
     declare_y_cmd = DeclareLaunchArgument(
         'y',
-        default_value='-2.0',
+        default_value='1.0',
         description='Initial y position in map frame (meters)'
     )
 
     declare_yaw_cmd = DeclareLaunchArgument(
         'yaw',
-        default_value='1.57',
+        default_value='0.0',
         description='Initial yaw angle in map frame (radians)'
     )
 
