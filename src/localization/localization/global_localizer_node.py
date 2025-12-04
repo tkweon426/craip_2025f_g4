@@ -19,6 +19,7 @@ The particle filter uses:
 
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSDurabilityPolicy
 from geometry_msgs.msg import TransformStamped, PoseStamped
 from sensor_msgs.msg import LaserScan, Imu
 from nav_msgs.msg import OccupancyGrid
@@ -51,9 +52,16 @@ class GlobalLocalizerNode(Node):
         self.tf_listener = TransformListener(self.tf_buffer, self)
         self.tf_broadcaster = TransformBroadcaster(self)
 
+        # ===== QoS profile for map (transient local for late joiners) =====
+        map_qos = QoSProfile(
+            reliability=QoSReliabilityPolicy.RELIABLE,
+            durability=QoSDurabilityPolicy.TRANSIENT_LOCAL,
+            depth=1
+        )
+
         # ===== Sensor subscriptions =====
         self.scan_sub = self.create_subscription(LaserScan, '/scan', self.scan_callback, 10)
-        self.map_sub = self.create_subscription(OccupancyGrid, '/map', self.map_callback, 10)
+        self.map_sub = self.create_subscription(OccupancyGrid, '/map', self.map_callback, map_qos)
         self.imu_sub = self.create_subscription(Imu, '/imu_plugin/out', self.imu_callback, 10)
 
         # ===== Publishers =====
