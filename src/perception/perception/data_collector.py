@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+from pathlib import Path
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
@@ -18,9 +19,12 @@ class DataCollector(Node):
     def __init__(self):
         super().__init__('data_collector')
 
+        # Default save dir: prefer src/perception/perception/data/images/train in workspace
+        # Fallbacks to installed package path or CWD/perception_data/images/train.
+        default_save_dir = str(self._resolve_default_save_dir())
+
         # Declare parameters
-        self.declare_parameter('save_dir',
-            '/home/tkweon426/craip_2025f_g4/src/perception/data/images/train')
+        self.declare_parameter('save_dir', default_save_dir)
         self.declare_parameter('capture_interval', 2.0)  # seconds
 
         self.save_dir = self.get_parameter('save_dir').value
@@ -49,6 +53,25 @@ class DataCollector(Node):
         self.get_logger().info('Images will be captured automatically.')
         self.get_logger().info('Press Ctrl+C to stop.')
         self.get_logger().info('=' * 60)
+
+    def _resolve_default_save_dir(self) -> Path:
+        """Find a collaborator-friendly default save path."""
+        pkg_file = Path(__file__).resolve()
+
+        # 1) Try workspace src layout: <workspace>/src/perception/perception/data/images/train
+        for parent in pkg_file.parents:
+            if parent.name == 'install':
+                ws_root = parent.parent
+                candidate = ws_root / 'src' / 'perception' / 'perception' / 'data' / 'images' / 'train'
+                return candidate
+
+        # 2) Fallback to installed package location
+        installed = pkg_file.parent / 'data' / 'images' / 'train'
+        if installed.exists():
+            return installed
+
+        # 3) Last resort: relative to current working directory
+        return Path.cwd() / 'perception_data' / 'images' / 'train'
 
     def image_callback(self, msg):
         """Store latest image"""
@@ -97,7 +120,11 @@ def main(args=None):
         node.get_logger().info('Next step: Label these images using LabelImg or Roboflow')
         node.get_logger().info('=' * 60)
         node.destroy_node()
-        rclpy.shutdown()
+        try:
+            rclpy.shutdown()
+        except Exception:
+            # Context may already be shutdown by launch system; ignore.
+            pass
 
 
 if __name__ == '__main__':
