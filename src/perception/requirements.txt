@@ -1,0 +1,14 @@
+# Perception module dependencies
+# Install with: pip install -r requirements.txt
+
+# YOLO object detection
+ultralytics>=8.0.0
+
+# Image processing
+opencv-python>=4.5.0
+numpy>=1.21.0
+
+# For GPU support (optional, but recommended for faster inference)
+# torch>=2.0.0
+# torchvision>=0.15.0
+
