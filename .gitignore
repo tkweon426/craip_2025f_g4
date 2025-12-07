@@ -4,3 +4,30 @@ log/
 .vscode/
 v-hacd/
 
+# ROS bag files (large binary data - 44+ GB total)
+evaluation_data/bags/**/*.db3
+evaluation_data/bags/**/*.mcap
+evaluation_data/bags/**/*.db3-*
+evaluation_data/bags/**/*.mcap-*
+
+# Keep bag metadata
+!evaluation_data/bags/**/metadata.yaml
+
+# Keep trajectory results and evaluation outputs
+!evaluation_data/results/**/*.txt
+!evaluation_data/results/**/*.png
+!evaluation_data/results/**/*.zip
+
+# Keep utility scripts
+!evaluation_data/scripts/**/*.py
+!evaluation_data/scripts/**/*.txt
+!evaluation_data/scripts/**/*.md
+
+# Old directories (cleaned up after reorganization)
+trajectory1-002/
+trajectory2/
+trajectory3-001/
+trajectory4-001/
+localization_rosbag_*/
+perception_bag/
+

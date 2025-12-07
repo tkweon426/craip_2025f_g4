@@ -40,12 +40,10 @@ import numpy as np
 
 class GlobalLocalizerNode(Node):
     def __init__(self):
-        super().__init__('global_localizer')
+        super().__init__('global_localizer',
+                        allow_undeclared_parameters=True,
+                        automatically_declare_parameters_from_overrides=True)
         self.get_logger().info('Global localizer node with MCL initialized')
-
-        # ===== Clock subscription =====
-        self.clock_sub = self.create_subscription(Clock, '/clock', self.clock_callback, 10)
-        self.current_time = None
 
         # ===== TF setup =====
         self.tf_buffer = Buffer()
@@ -74,18 +72,16 @@ class GlobalLocalizerNode(Node):
         self.likelihood_field = None
 
         # ===== Get initial pose from launch parameters =====
-        self.declare_parameter('x', 0.0)
-        self.declare_parameter('y', 1.0)
-        self.declare_parameter('yaw', 0.0)
-        x_init = self.get_parameter('x').value
-        y_init = self.get_parameter('y').value
-        yaw_init = self.get_parameter('yaw').value
+        # Parameters are already declared by automatically_declare_parameters_from_overrides
+        x_init = self.get_parameter_or('x', rclpy.Parameter('x', rclpy.Parameter.Type.DOUBLE, 0.0)).value
+        y_init = self.get_parameter_or('y', rclpy.Parameter('y', rclpy.Parameter.Type.DOUBLE, 1.0)).value
+        yaw_init = self.get_parameter_or('yaw', rclpy.Parameter('yaw', rclpy.Parameter.Type.DOUBLE, 0.0)).value
         self.z = 0.33  # Height of robot base when standing
 
         self.get_logger().info(f'Initial pose: x={x_init}, y={y_init}, yaw={yaw_init}')
 
         # ===== Particle filter parameters =====
-        self.num_particles = 1000
+        self.num_particles = 500
         self.initial_variance = [0.5, 0.5, 0.2]  # [var_x, var_y, var_theta]
 
         # Motion model noise
@@ -116,10 +112,6 @@ class GlobalLocalizerNode(Node):
         # ===== Create timer for particle filter updates =====
         self.interval_tf_pub = 0.1  # 10 Hz
         self.tf_timer = self.create_timer(self.interval_tf_pub, self.tf_callback)
-
-    def clock_callback(self, msg):
-        """Update simulation time from Gazebo"""
-        self.current_time = Time.from_msg(msg.clock)
 
     def scan_callback(self, msg):
         """Store latest scan for measurement update"""
@@ -194,14 +186,14 @@ class GlobalLocalizerNode(Node):
 
     def publish_transform(self):
         """Publish map->odom transform"""
-        if self.T_map_to_odom is None or self.current_time is None:
+        if self.T_map_to_odom is None:
             return
 
         translation = self.T_map_to_odom[:3, 3]
         quaternion = tf_transformations.quaternion_from_matrix(self.T_map_to_odom)
 
         tf_msg = TransformStamped()
-        tf_msg.header.stamp = self.current_time.to_msg()
+        tf_msg.header.stamp = self.get_clock().now().to_msg()
         tf_msg.header.frame_id = 'map'
         tf_msg.child_frame_id = 'odom'
         tf_msg.transform.translation.x = translation[0]
@@ -221,13 +213,11 @@ class GlobalLocalizerNode(Node):
         Args:
             pose: [x, y, theta]
         """
-        if self.current_time is None:
-            return
-
         x, y, theta = pose
 
         msg = PoseStamped()
-        msg.header.stamp = self.current_time.to_msg()
+        # Use timestamp from latest scan for proper simulation time
+        msg.header.stamp = self.latest_scan.header.stamp
         msg.header.frame_id = 'map'
         msg.pose.position.x = x
         msg.pose.position.y = y
@@ -250,9 +240,6 @@ class GlobalLocalizerNode(Node):
         4. Estimate: Compute pose from particles
         5. Publish: Update transforms and pose
         """
-        if self.current_time is None:
-            return
-
         # Wait for map
         if self.occupancy_grid is None or self.likelihood_field is None:
             self.get_logger().warn('Waiting for map...', throttle_duration_sec=2.0)
