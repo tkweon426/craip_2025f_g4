@@ -114,8 +114,9 @@ class OdomLocalizerNode(Node):
 
         end_time = self.get_clock().now()
         time_delta = (end_time - start_time).nanoseconds / 1e9
-        frequency = 1.0 / time_delta
-        self.get_logger().info(f'ICP registration frequency: {frequency:.3f} Hz')
+        if time_delta > 0:
+            frequency = 1.0 / time_delta
+            self.get_logger().info(f'ICP registration frequency: {frequency:.3f} Hz')
 
 
 if __name__ == '__main__':

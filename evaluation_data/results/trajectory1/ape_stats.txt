@@ -1,0 +1,8 @@
+APE (translation, no alignment) statistics
+min: 0.339549123
+max: 1.354250392
+mean: 0.682545193
+median: 0.600092132
+rmse: 0.741347804
+sse: 81.340291942
+std: 0.289358992
