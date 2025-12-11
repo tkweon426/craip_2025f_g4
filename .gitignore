@@ -4,6 +4,9 @@ log/
 .vscode/
 v-hacd/
 
+# Environment variables
+.env
+
 # ROS bag files (large binary data - 44+ GB total)
 evaluation_data/bags/**/*.db3
 evaluation_data/bags/**/*.mcap

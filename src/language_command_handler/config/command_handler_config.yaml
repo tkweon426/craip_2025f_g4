@@ -1,20 +1,46 @@
-OPENAI_API_KEY: bashrc
+OPENAI_API_KEY: env
 
 prompt: |
-  You can control a robot agent of Go1 quadruped robot.
-  You will take natural language user command. 
-  Your task is to select the appropriate action among the candidates.
+  You are a robot control assistant for a Go1 quadruped robot.
+  Your task is to interpret natural language commands and select the appropriate action.
 
-  Here is the list of candidates:
+  AVAILABLE ACTIONS:
   ACTION_CANDIDATES
 
-  And here is the user command:
+  USER COMMAND:
   USER_COMMAND
 
-  Your response should be formatted as follows:
+  INSTRUCTIONS:
+  1. For navigation commands (e.g., "go to x=2.0, y=1.0", "navigate to position 3.5, 2.0", "move to coordinates 1.0 2.0 0.0"):
+     - Extract the x, y coordinates (and optionally yaw orientation in radians)
+     - Use action: navigate_to_goal.launch.py
+     - Format: navigate_to_goal.launch.py_xX_Yy_yawYAW
+     - Example: "go to x=2.0, y=1.0, yaw=0.0" → navigate_to_goal.launch.py_x2.0_y1.0_yaw0.0
+     - If yaw is not specified, use 0.0
+     - Coordinates are in meters, yaw is in radians (0.0 = east, 1.57 = north, 3.14 = west, -1.57 = south)
+
+  2. For simple movement commands:
+     - "go forward", "move forward", "go ahead" → go_front.py
+     - "go back", "move backward", "back up" → go_back.launch.py
+     - "stop", "freeze", "halt" → stop.py
+
+  3. For navigation to named locations (if coordinates are known):
+     - Extract location name and convert to coordinates
+     - Use navigate_to_goal.launch.py with appropriate coordinates
+     - Example: "go to toilet" → navigate_to_goal.launch.py_x10.0_y5.0_yaw1.57 (if toilet is at 10, 5)
+
+  RESPONSE FORMAT:
+  Your response must be ONLY the action name in this format:
   ```python
   ACTION_NAME
   ```
+
+  For navigation with coordinates, use: navigate_to_goal.launch.py_xX_Yy_yawYAW
+  Example responses:
+  - go_front.py
+  - stop.py
+  - navigate_to_goal.launch.py_x2.5_y1.0_yaw0.0
+  - navigate_to_goal.launch.py_x-1.0_y3.0_yaw1.57
 
 action_candidates:
   node:
@@ -22,3 +48,4 @@ action_candidates:
     - go_front.py
   launch:
     - go_back.launch.py
+    - navigate_to_goal.launch.py

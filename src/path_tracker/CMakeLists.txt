@@ -76,6 +76,7 @@ ament_python_install_package(${PROJECT_NAME})
 install(
   PROGRAMS
     path_tracker/move_go1.py
+    path_tracker/astar_path_planner_node.py
   DESTINATION lib/${PROJECT_NAME}       
 )
 
