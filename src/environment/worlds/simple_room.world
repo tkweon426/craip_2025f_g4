@@ -182,6 +182,8 @@
 
 
     <!-- Sample food models (z-heights taken from hospital.world placements) -->
+    <!-- Food and dish models deactivated for annotation only -->
+    <!--
     <model name='apple_good'>
       <include>
         <uri>model://AppleGood</uri>
@@ -277,6 +279,88 @@
         <pose>-0.35 -0.61 0.3 0 0 0</pose>
       </include>
     </model>
+    -->
+
+    <!-- Center triangle: danger sign, circle sign, scrub (nurse) -->
+    <model name='danger_sign_1'>
+      <include>
+        <uri>model://danger_sign</uri>
+        <static>true</static>
+        <pose>0 0.6 0 0 0 0</pose>
+      </include>
+    </model>
+
+    <model name='circle_sign_1'>
+      <include>
+        <uri>model://circle_sign</uri>
+        <static>true</static>
+        <pose>-0.55 -0.35 0 0 0 0</pose>
+      </include>
+    </model>
+
+    <model name='scrub_1'>
+      <include>
+        <uri>model://Scrubs</uri>
+        <static>true</static>
+        <pose>0.55 -0.35 0 0 0 0</pose>
+      </include>
+    </model>
+
+    <!-- Cones aligned near east wall (annotation only)
+    <model name='blue_cone_1'>
+      <include>
+        <uri>model://blue_cone</uri>
+        <static>true</static>
+        <pose>1.8 1.0 0 0 0 0</pose>
+      </include>
+    </model>
+
+    <model name='red_cone_1'>
+      <include>
+        <uri>model://red_cone</uri>
+        <static>true</static>
+        <pose>1.8 0.0 0 0 0 0</pose>
+      </include>
+    </model>
+
+    <model name='green_cone_1'>
+      <include>
+        <uri>model://green_cone</uri>
+        <static>true</static>
+        <pose>1.8 -1.0 0 0 0 0</pose>
+      </include>
+    </model>
+    -->
+
+    <!-- Box and goal line preserved for annotation only
+    <model name='box_1'>
+      <include>
+        <uri>model://box</uri>
+        <static>false</static>
+        <pose>0.885 -1.447 0.5 0 0 0</pose>
+      </include>
+    </model>
+
+    <model name='goal_line_box'>
+      <static>true</static>
+      <link name='link'>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0 0 1</ambient>
+            <diffuse>1 0 0 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>0 0 0 1</emissive>
+          </material>
+        </visual>
+      </link>
+      <pose>1.031 -0.3 -0.499 0 0 0</pose>
+    </model>
+    -->
 
   </world>
 </sdf>
