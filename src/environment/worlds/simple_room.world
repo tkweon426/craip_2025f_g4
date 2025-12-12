@@ -186,7 +186,7 @@
       <include>
         <uri>model://AppleGood</uri>
         <static>true</static>
-        <pose>-1.0 -0.6 0.45 0 0 0</pose>
+        <pose>-0.7 0 0.45 0 0 0</pose>
       </include>
     </model>
 
@@ -194,7 +194,7 @@
       <include>
         <uri>model://WhiteDish</uri>
         <static>true</static>
-        <pose>-1.0 -0.6 0.40 0 0 0</pose>
+        <pose>-0.7 0 0.40 0 0 0</pose>
       </include>
     </model>
 
@@ -202,7 +202,7 @@
       <include>
         <uri>model://BananaGood</uri>
         <static>true</static>
-        <pose>0.0 -0.6 0.25 0 0 0</pose>
+        <pose>-0.35 0.61 0.25 0 0 0</pose>
       </include>
     </model>
 
@@ -210,7 +210,7 @@
       <include>
         <uri>model://WhiteDish</uri>
         <static>true</static>
-        <pose>0.0 -0.6 0.20 0 0 0</pose>
+        <pose>-0.35 0.61 0.20 0 0 0</pose>
       </include>
     </model>
 
@@ -218,7 +218,7 @@
       <include>
         <uri>model://PizzaBad</uri>
         <static>true</static>
-        <pose>1.0 -0.6 0.65 0 0 0</pose>
+        <pose>0.35 0.61 0.65 0 0 0</pose>
       </include>
     </model>
 
@@ -226,7 +226,7 @@
       <include>
         <uri>model://WhiteDish</uri>
         <static>true</static>
-        <pose>1.0 -0.6 0.60 0 0 0</pose>
+        <pose>0.35 0.61 0.60 0 0 0</pose>
       </include>
     </model>
 
@@ -234,7 +234,7 @@
       <include>
         <uri>model://AppleBad</uri>
         <static>true</static>
-        <pose>-1.0 0.6 0.55 0 0 0</pose>
+        <pose>0.7 0 0.55 0 0 0</pose>
       </include>
     </model>
 
@@ -242,7 +242,7 @@
       <include>
         <uri>model://WhiteDish</uri>
         <static>true</static>
-        <pose>-1.0 0.6 0.50 0 0 0</pose>
+        <pose>0.7 0 0.50 0 0 0</pose>
       </include>
     </model>
 
@@ -250,7 +250,7 @@
       <include>
         <uri>model://BananaBad</uri>
         <static>true</static>
-        <pose>0.0 0.6 0.35 0 0 0</pose>
+        <pose>0.35 -0.61 0.35 0 0 0</pose>
       </include>
     </model>
 
@@ -258,7 +258,7 @@
       <include>
         <uri>model://WhiteDish</uri>
         <static>true</static>
-        <pose>0.0 0.6 0.3 0 0 0</pose>
+        <pose>0.35 -0.61 0.3 0 0 0</pose>
       </include>
     </model>
 
@@ -266,7 +266,7 @@
       <include>
         <uri>model://PizzaGood</uri>
         <static>true</static>
-        <pose>1.0 0.6 0.35 0 0 0</pose>
+        <pose>-0.35 -0.61 0.35 0 0 0</pose>
       </include>
     </model>
 
@@ -274,7 +274,7 @@
       <include>
         <uri>model://WhiteDish</uri>
         <static>true</static>
-        <pose>1.0 0.6 0.3 0 0 0</pose>
+        <pose>-0.35 -0.61 0.3 0 0 0</pose>
       </include>
     </model>
 

@@ -30,7 +30,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'capture_interval',
-            default_value='2.0',
+            default_value='0.5',
             description='Interval between image captures in seconds'
         ),
 

@@ -25,7 +25,7 @@ class DataCollector(Node):
 
         # Declare parameters
         self.declare_parameter('save_dir', default_save_dir)
-        self.declare_parameter('capture_interval', 2.0)  # seconds
+        self.declare_parameter('capture_interval', 0.5)  # seconds
 
         self.save_dir = self.get_parameter('save_dir').value
         self.capture_interval = self.get_parameter('capture_interval').value
