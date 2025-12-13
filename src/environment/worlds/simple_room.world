@@ -76,7 +76,7 @@
       </uri>
     </include>
 
-    <!-- North Wall -->
+    <!-- Walls commented out for annotation only
     <model name='north_wall'>
       <static>true</static>
       <pose>0 2.5 1 0 0 0</pose>
@@ -102,7 +102,6 @@
       </link>
     </model>
 
-    <!-- South Wall -->
     <model name='south_wall'>
       <static>true</static>
       <pose>0 -2.5 1 0 0 0</pose>
@@ -128,7 +127,6 @@
       </link>
     </model>
 
-    <!-- East Wall -->
     <model name='east_wall'>
       <static>true</static>
       <pose>2.5 0 1 0 0 0</pose>
@@ -154,7 +152,6 @@
       </link>
     </model>
 
-    <!-- West Wall -->
     <model name='west_wall'>
       <static>true</static>
       <pose>-2.5 0 1 0 0 0</pose>
@@ -179,6 +176,7 @@
         </visual>
       </link>
     </model>
+    -->
 
 
     <!-- Sample food models (z-heights taken from hospital.world placements) -->
@@ -281,20 +279,12 @@
     </model>
     -->
 
-    <!-- Center triangle: danger sign, circle sign, scrub (nurse) -->
-    <model name='danger_sign_1'>
-      <include>
-        <uri>model://danger_sign</uri>
-        <static>true</static>
-        <pose>0 0.6 0 0 0 0</pose>
-      </include>
-    </model>
-
+    <!-- Center triangle: circle sign + two scrubs (nurses) -->
     <model name='circle_sign_1'>
       <include>
         <uri>model://circle_sign</uri>
         <static>true</static>
-        <pose>-0.55 -0.35 0 0 0 0</pose>
+        <pose>-0.6 0.5 0 0 0 0</pose>
       </include>
     </model>
 
@@ -302,7 +292,15 @@
       <include>
         <uri>model://Scrubs</uri>
         <static>true</static>
-        <pose>0.55 -0.35 0 0 0 0</pose>
+        <pose>0.7 0.5 0 0 0 0</pose>
+      </include>
+    </model>
+
+    <model name='scrub_2'>
+      <include>
+        <uri>model://Scrubs</uri>
+        <static>true</static>
+        <pose>0.0 -0.6 0 0 0 3.14</pose>
       </include>
     </model>
 
