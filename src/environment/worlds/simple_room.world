@@ -76,7 +76,7 @@
       </uri>
     </include>
 
-    <!-- Walls commented out for annotation only
+<!--
     <model name='north_wall'>
       <static>true</static>
       <pose>0 2.5 1 0 0 0</pose>
@@ -176,7 +176,7 @@
         </visual>
       </link>
     </model>
-    -->
+-->
 
 
     <!-- Sample food models (z-heights taken from hospital.world placements) -->
@@ -198,11 +198,13 @@
       </include>
     </model>
 
+      -->
+
     <model name='banana_good'>
       <include>
         <uri>model://BananaGood</uri>
         <static>true</static>
-        <pose>-0.35 0.61 0.25 0 0 0</pose>
+        <pose>-0.35 0.61 0.05 0 0 0</pose>
       </include>
     </model>
 
@@ -210,7 +212,7 @@
       <include>
         <uri>model://WhiteDish</uri>
         <static>true</static>
-        <pose>-0.35 0.61 0.20 0 0 0</pose>
+        <pose>-0.35 0.61 0.0 0 0 0</pose>
       </include>
     </model>
 
@@ -218,7 +220,7 @@
       <include>
         <uri>model://PizzaBad</uri>
         <static>true</static>
-        <pose>0.35 0.61 0.65 0 0 0</pose>
+        <pose>0.35 0.61 0.05 0 0 0</pose>
       </include>
     </model>
 
@@ -226,10 +228,12 @@
       <include>
         <uri>model://WhiteDish</uri>
         <static>true</static>
-        <pose>0.35 0.61 0.60 0 0 0</pose>
+        <pose>0.35 0.61 0.00 0 0 0</pose>
       </include>
     </model>
 
+
+<!--
     <model name='apple_bad'>
       <include>
         <uri>model://AppleBad</uri>
@@ -246,11 +250,13 @@
       </include>
     </model>
 
+          -->
+
     <model name='banana_bad'>
       <include>
         <uri>model://BananaBad</uri>
         <static>true</static>
-        <pose>0.35 -0.61 0.35 0 0 0</pose>
+        <pose>0.35 -0.61 0.05 0 0 0</pose>
       </include>
     </model>
 
@@ -258,7 +264,23 @@
       <include>
         <uri>model://WhiteDish</uri>
         <static>true</static>
-        <pose>0.35 -0.61 0.3 0 0 0</pose>
+        <pose>0.35 -0.61 0.0 0 0 0</pose>
+      </include>
+    </model>
+
+        <model name='banana_bad_2'>
+      <include>
+        <uri>model://BananaBad</uri>
+        <static>true</static>
+        <pose>0.7 0 0.05 0 0 0</pose>
+      </include>
+    </model>
+
+    <model name='banana_bad_dish_2'>
+      <include>
+        <uri>model://WhiteDish</uri>
+        <static>true</static>
+        <pose>0.7 0 0.0 0 0 0</pose>
       </include>
     </model>
 
@@ -266,7 +288,7 @@
       <include>
         <uri>model://PizzaGood</uri>
         <static>true</static>
-        <pose>-0.35 -0.61 0.35 0 0 0</pose>
+        <pose>-0.35 -0.61 0.05 0 0 0</pose>
       </include>
     </model>
 
@@ -274,12 +296,28 @@
       <include>
         <uri>model://WhiteDish</uri>
         <static>true</static>
-        <pose>-0.35 -0.61 0.3 0 0 0</pose>
+        <pose>-0.35 -0.61 0.0 0 0 0</pose>
       </include>
     </model>
-    -->
 
-    <!-- Center triangle: circle sign + two scrubs (nurses) -->
+    <model name='pizza_bad_2'>
+      <include>
+        <uri>model://PizzaBad</uri>
+        <static>true</static>
+        <pose>-0.7 0 0.05 0 0 0</pose>
+      </include>
+    </model>
+
+    <model name='pizza_bad_dish_2'>
+      <include>
+        <uri>model://WhiteDish</uri>
+        <static>true</static>
+        <pose>-0.7 0 0.00 0 0 0</pose>
+      </include>
+    </model>
+
+
+    <!-- Center triangle: circle sign + two scrubs (nurses)
     <model name='circle_sign_1'>
       <include>
         <uri>model://circle_sign</uri>
@@ -304,7 +342,7 @@
       </include>
     </model>
 
-    <!-- Cones aligned near east wall (annotation only)
+ Cones aligned near east wall (annotation only)
     <model name='blue_cone_1'>
       <include>
         <uri>model://blue_cone</uri>
